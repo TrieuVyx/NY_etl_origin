@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="theme-color" content="#000000">
+    <title>Delete</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" integrity="sha512-8RxmFOVaKQe/xtg6lbscU9DU0IRhURWEuiI0tXevv+lXbAHfkpamD4VKFQRto9WgfOJDwOZ74c/s9Yesv3VvIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" integrity="sha512-d0olNN35C6VLiulAobxYHZiXJmq+vl+BGIgAxQtD5+kqudro/xNMvv2yIHAciGHpExsIbKX3iLg+0B6d0k4+ZA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+
+<div class="container ">
+    <div class="justify-content-center align-items-center d-flex w-100">
+        <form class="w-50 p-5" th:action="@{/users/api/delete/{id}(id=${usersModel.id})}" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="header mb-2 mt-2">
+                <h1>Delete Form</h1>
+            </div>
+            <!-- Username input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" for="username">Username</label>
+                <input th:field="*{usersModel.username}" type="text" id="username" class="form-control" th:value="${usersModel.username}" />
+            </div>
+            <!-- Email input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" for="email">Email address</label>
+                <input type="email" th:field="*{usersModel.email}" id="email" class="form-control" th:value="${usersModel.email}"/>
+            </div>
+
+
+
+            <!--            &lt;!&ndash; Password input &ndash;&gt;-->
+            <!--            <div class="form-outline mb-4">-->
+            <!--                <label class="form-label" for="password">Password</label>-->
+            <!--                <input type="password"  th:field="*{usersModel.password}" id="password" class="form-control" th:value="${usersModel.password}" />-->
+            <!--            </div>-->
+
+
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-danger btn-block mb-4" onclick=" return confirm ('are u sure')">Delete</button>
+            <a href="/users" class="btn btn-primary btn-block mb-4" >Home</a>
+
+        </form>
+    </div>
+</div>
+</body>
+</html>
