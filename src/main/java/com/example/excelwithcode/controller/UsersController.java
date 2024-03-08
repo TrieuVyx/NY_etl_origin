@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
+
 import jakarta.validation.Valid;
 
 @Controller
@@ -30,7 +32,7 @@ public class UsersController {
     }
 
     // create form
-    @GetMapping("users/api/create")
+    @GetMapping("users/create")
     public String ShowFormCreate(Model model){
         UsersModel usersModel = new UsersModel();
         model.addAttribute("usersModel",usersModel);
@@ -53,7 +55,7 @@ public class UsersController {
     }
     //register form
     @GetMapping("/register")
-    public String ShowFormRegister(@ModelAttribute Model model){
+    public String ShowFormRegister( Model model){
         UsersModel usersModel = new UsersModel();
         model.addAttribute("usersModel",usersModel);
         return "register";
@@ -70,12 +72,10 @@ public class UsersController {
     //create
     @PostMapping ( "users/create" )
     public String createUser(@Valid UsersModel usersModel, BindingResult bindingResult){
-        return getString(usersModel, bindingResult);
-    }
-
-    private String getString(@Valid UsersModel usersModel, BindingResult bindingResult) {
         try{
-
+            if(bindingResult.hasErrors()){
+                return "Users/create";
+            }
             // Mã hóa mật keys
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String hashedPassword = encoder.encode(usersModel.getPassword());
@@ -87,21 +87,22 @@ public class UsersController {
 
             // Tạo mã thông báo
             String token = Jwts.builder()
-            // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
+                    // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
                     .setSubject(usersModel.getUsername())
                     .compact() ;
 
             // Trả về mã thông báo trong response
             usersModel1.setToken(token);
-
+            usersService.setUser(usersModel1);
 //            return new ResponseEntity<>( usersModel1,HttpStatus.OK);
-            return  usersService.setUser(usersModel1);
+            return  "Users/create";
         }
         catch(Exception e){
             return e.getMessage();
 //            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @PostMapping("/users/api/delete/{id}")
     public String deleteUser(@PathVariable Long id, Model model){
@@ -142,31 +143,88 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login( UsersModel usersModel) {
-        try {
-            boolean isAuthenticated = usersService.authenticateUser(usersModel.getUsername(), usersModel.getPassword());
-
-            if (isAuthenticated) {
-                String token = Jwts.builder()
-                        // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
-                        .setSubject(usersModel.getUsername())
-                        .compact();
-
-                return new ResponseEntity<>(token, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public String login(@Valid UsersModel usersModel, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "register"; // Return to the registration page if there are validation errors
         }
+
+        boolean isAuthenticated = usersService.authenticateUser(usersModel.getEmail(), usersModel.getPassword());
+
+        if (!isAuthenticated) {
+            // Generate the token
+            String token = Jwts.builder()
+                    // .signWith(SignatureAlgorithm.HS256, "sdaAa@dawâss")
+                    .setSubject(usersModel.getEmail())
+                    .compact();
+
+            return "login"; // Redirect to the login success page
+        }
+        return "index";
     }
+
+
     @PostMapping ( "/register" )
-    public String createUserR(@Valid  UsersModel usersModel, BindingResult bindingResult){
-       return getString(usersModel, bindingResult);
+    public String createUserR(@Valid UsersModel usersModel, BindingResult bindingResult){
+        try{
+
+            if(bindingResult.hasErrors()){
+                return "register";
+            }
+            // Mã hóa mật keys
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String hashedPassword = encoder.encode(usersModel.getPassword());
+
+            UsersModel usersModel1 = new UsersModel();
+            if(!usersService.EmailSame(usersModel.getEmail()) & !usersService.UsernameSame(usersModel.getUsername())){
+                return "register";
+            }
+
+            usersModel1.setUsername(usersModel.getUsername());
+            usersModel1.setEmail(usersModel.getEmail());
+            usersModel1.setPassword(hashedPassword);
+
+            // Tạo mã thông báo
+            String token = Jwts.builder()
+                    // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
+                    .setSubject(usersModel.getUsername())
+                    .compact() ;
+
+            // Trả về mã thông báo trong response
+            usersModel1.setToken(token);
+            usersService.setUser(usersModel1);
+        //  return new ResponseEntity<>( usersModel1,HttpStatus.OK);
+            return  "login";
+        }
+        catch(Exception e){
+            return e.getMessage();
+            //    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     @PostMapping ( "/deleteAll" )
     public String deleteAll(){
         usersService.DeleteAll();
         return "Users/index";
     }
+
+
+
+//    @PostMapping("/login")
+//    public ResponseEntity<String> login(@Valid UsersModel usersModel, BindingResult bindingResult) {
+//        try {
+//            boolean isAuthenticated = usersService.authenticateUser(usersModel.getUsername(), usersModel.getPassword());
+//
+//            if (isAuthenticated) {
+//                String token = Jwts.builder()
+//                        // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
+//                        .setSubject(usersModel.getUsername())
+//                        .compact();
+//
+//                return new ResponseEntity<>(token, HttpStatus.OK);
+//            } else {
+//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//            }
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//    }
 }

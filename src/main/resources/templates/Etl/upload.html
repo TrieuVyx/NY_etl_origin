@@ -51,24 +51,13 @@
             </form>
         </div>
     </nav>
-    <div class="container ">
-        <a href="/etl/read" class="btn btn-outline-success my-2 my-sm-0" >Read File From Data</a>
-        <a href="/etl/upload" class="btn btn-outline-success my-2 my-sm-0" >Import File</a>
-        <a href="/etl/create" class="btn btn-outline-success my-2 my-sm-0" >Read File</a>
 
+    <div class="container">
+        <form th:action="@{/etl/upload}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv">
+            <input type="submit" value="Upload" class="custom-file-label" id="upload">
+        </form>
     </div>
-
-<!--    <table class="table">-->
-<!--        <tbody>-->
-<!--        <tr th:each="row : ${rows}">-->
-<!--            <td th:each="value : ${row}" th:text="${value}"></td>-->
-<!--        </tr>-->
-<!--        </tbody>-->
-
-<!--    </table>-->
-
-
-</div>
-
+    </div>
 </body>
 </html>

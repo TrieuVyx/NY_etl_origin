@@ -52,20 +52,25 @@
         </div>
     </nav>
     <div class="container ">
-        <a href="/etl/read" class="btn btn-outline-success my-2 my-sm-0" >Read File From Data</a>
-        <a href="/etl/upload" class="btn btn-outline-success my-2 my-sm-0" >Import File</a>
-        <a href="/etl/create" class="btn btn-outline-success my-2 my-sm-0" >Read File</a>
+            <form th:action="@{create}" class="d-flex align-content-center" method="post" enctype="multipart/form-data">
+                <div class="">
+                    <label for="file" class="buttonCsv">Select a file:</label>
+                    <input type="file" class="form-control" id="file" name="file" accept=".csv">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm  form-control" id="buttonCsv">CSV</button>
+            </form>
+
 
     </div>
 
-<!--    <table class="table">-->
-<!--        <tbody>-->
-<!--        <tr th:each="row : ${rows}">-->
-<!--            <td th:each="value : ${row}" th:text="${value}"></td>-->
-<!--        </tr>-->
-<!--        </tbody>-->
+    <table class="table">
+        <tbody>
+        <tr th:each="row : ${rows}">
+            <td th:each="value : ${row}" th:text="${value}"></td>
+        </tr>
+        </tbody>
 
-<!--    </table>-->
+    </table>
 
 
 </div>

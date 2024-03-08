@@ -11,15 +11,24 @@ public class UsersModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "username cannot empty")
+
+//    @Max(15)
+//    @Min(5)
+    @NotBlank(message = "Username cannot empty")
     private String username;
-    @NotBlank(message = "password cannot empty")
+//    @Max(value = 15, message = "Character have to equal 15 or much than 15")
+//    @Min(value = 10, message = "Character have to equal 10 or less than 10")
+    @NotBlank(message = "Password cannot empty")
     private String password;
-    @NotBlank(message = "email cannot empty")
+    @NotBlank(message = "Email cannot empty")
+    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "Invalid email format")
     private String email;
     private String token;
     private String permission;
     private String avatar;
+
+    public UsersModel() {
+    }
 
 
     public void setId(Long id) {
@@ -64,4 +73,6 @@ public class UsersModel {
     public String getAvatar(){
         return avatar;
     }
+
+
 }

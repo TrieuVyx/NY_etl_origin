@@ -52,23 +52,45 @@
         </div>
     </nav>
     <div class="container ">
-        <a href="/etl/read" class="btn btn-outline-success my-2 my-sm-0" >Read File From Data</a>
-        <a href="/etl/upload" class="btn btn-outline-success my-2 my-sm-0" >Import File</a>
         <a href="/etl/create" class="btn btn-outline-success my-2 my-sm-0" >Read File</a>
-
+        <a href="/etl/upload" class="btn btn-outline-success my-2 my-sm-0" >Import File</a>
     </div>
 
-<!--    <table class="table">-->
-<!--        <tbody>-->
-<!--        <tr th:each="row : ${rows}">-->
-<!--            <td th:each="value : ${row}" th:text="${value}"></td>-->
-<!--        </tr>-->
-<!--        </tbody>-->
+    <!--    <table class="table">-->
+    <!--        <tbody>-->
+    <!--        <tr th:each="row : ${rows}">-->
+    <!--            <td th:each="value : ${row}" th:text="${value}"></td>-->
+    <!--        </tr>-->
+    <!--        </tbody>-->
 
-<!--    </table>-->
+    <!--    </table>-->
 
 
 </div>
+<div class="container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Age</th>
+            <th scope="col">Email</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="etlModel : ${etlModelList}">
+            <td scope="row" th:text="${etlModel.id}"></td>
+            <td scope="row" th:text="${etlModel.name}"></td>
+            <td scope="row" th:text="${etlModel.age}"></td>
+            <td scope="row" th:text="${etlModel.email}"></td>
+        </tr>
+        </tbody>
+
+
+    </table>
+</div>
+
 
 </body>
 </html>

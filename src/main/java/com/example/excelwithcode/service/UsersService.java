@@ -46,8 +46,8 @@ public class UsersService {
         usersRepository.save(usersModel);
     }
     // login
-    public boolean authenticateUser(String username, String password) {
-        UsersModel user = usersRepository.findByUsername(username);
+    public boolean authenticateUser(String email, String password) {
+        UsersModel user = usersRepository.findByEmail(email);
         if (user != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             return encoder.matches(password, user.getPassword());
@@ -55,11 +55,24 @@ public class UsersService {
         return false;
     }
 
+    public boolean EmailSame(String email){
+        UsersModel EmailExist = usersRepository.findByEmail(email);
+        return EmailExist == null;
+    }
+    public boolean UsernameSame(String username){
+        UsersModel UsernameExist = usersRepository.findByEmail(username);
+        return UsernameExist == null;
+    }
+
+
     //delete all
 
-    public String DeleteAll(){
+    public void DeleteAll(){
         usersRepository.deleteAll();
-        return null;
     }
+
+
+
+
 
 }

@@ -14,25 +14,30 @@
 
 <div class="container ">
     <div class="justify-content-center align-items-center d-flex w-100">
-        <form class="w-50 p-5" th:action="@{/users/create}" method="POST" enctype="multipart/form-data"  >
+        <form class="w-50 p-5" th:action="@{/users/create}" method="POST" enctype="multipart/form-data" th:object="${usersModel}"  >
             <div class="header mb-2 mt-2">
                 <h1>Create Form</h1>
             </div>
             <!-- Username input -->
+
             <div class="form-outline mb-4">
-                <label class="form-label" for="username">Username</label>
-                <input  type="text" id="username" class="form-control" placeholder="enter your username" th:value="${usersModel.username}"  th:field="${usersModel.username}" />
+                <label for="username">Username</label>
+                <input type="text" id="username" class="form-control" th:field="${usersModel.username}" />
+                <span th:if="${#fields.hasErrors('username')}" class="text-danger" th:errors="${usersModel.username}"></span>
             </div>
             <!-- Email input -->
+
             <div class="form-outline mb-4">
-                <label class="form-label" for="email">Email address</label>
-                <input type="email" id="email" class="form-control"  placeholder="enter your email" th:value="${usersModel.email}" th:field="${usersModel.email}"/>
+                <label for="email">Email</label>
+                <input type="text" id="email" class="form-control" th:field="${usersModel.email}" />
+                <span th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="${usersModel.email}"></span>
             </div>
 
             <!-- Password input -->
             <div class="form-outline mb-4">
-                <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" class="form-control"  placeholder="enter your password" th:value="${usersModel.password}" th:field="${usersModel.password}"/>
+                <label for="password">Password</label>
+                <input type="text" id="password" class="form-control" th:field="${usersModel.password}" />
+                <span th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="${usersModel.password}"></span>
             </div>
 
 
