@@ -51,30 +51,13 @@
             </form>
         </div>
     </nav>
-    <div class="container ">
+    <h1>Export CSV</h1>
+    <form th:action="@{export}" class="d-flex align-content-center" method="post" enctype="multipart/form-data">
+        <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Export CSV</button>
+    </form>
+    <div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
+    <div th:if="${outputPath}" th:text="${outputPath}" style="color: green;"></div>
 
-        <div class="container">
-            <form th:action="@{/etl/upload}" class="d-flex align-items-center" method="post" enctype="multipart/form-data">
-                <div class="container">
-                    <div class="d-flex">
-                        <input type="file" id="file" name="file" accept=".csv">
-                        <button type="submit" class="btn btn-primary btn-sm btn btn-outline-success my-2 my-sm-0" id="buttonCsv">CSV</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-
-    </div>
-
-    <table class="table">
-        <tbody>
-        <tr th:each="row : ${rows}">
-            <td th:each="value : ${row}" th:text="${value}"></td>
-        </tr>
-        </tbody>
-
-    </table>
 
 
 </div>

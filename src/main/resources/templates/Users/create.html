@@ -40,10 +40,12 @@
                 <span th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="${usersModel.password}"></span>
             </div>
 
-
             <!-- Submit button -->
-            <button type="submit" class="btn btn-primary btn-block mb-4">Create</button>
-            <a href="/users" class="btn btn-primary btn-block mb-4" >Home</a>
+            <div class="d-flex">
+                <button type="submit" class="btn btn-outline-success my-2 my-sm-0 m-1">Create</button>
+                <a href="/users" class="btn btn-outline-success my-2 my-sm-0" >Home</a>
+            </div>
+
 
         </form>
     </div>

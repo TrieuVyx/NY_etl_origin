@@ -1,16 +1,13 @@
 package com.example.excelwithcode.controller;
 
 import com.example.excelwithcode.model.EtlModel;
-import com.example.excelwithcode.model.UsersModel;
 import com.example.excelwithcode.service.EtlService;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +19,6 @@ import java.sql.*;
 import java.util.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.IOException;
 import java.util.logging.Logger;
 @Controller
 @PersistenceContext
@@ -62,15 +58,10 @@ public class EtlController {
         model.addAttribute("etlModelList", etlModelList);
         return "Etl/read";
     }
-    //    @GetMapping("etl/read")
-//    public String readFileDatabase(Model model, @RequestParam("filePath") String filePath) {
-//        List<EtlModel> etlModelList = etlService.readDataFromCSV(filePath);
-//        model.addAttribute("etlModelList", etlModelList);
-//        return "Etl/read";
-//    }
-//    public List<EtlModel> ReadFileData(){
-//        return etlService.getAllETL();
-//    }
+    @GetMapping("etl/export")
+    public String ExportFile() {
+        return "Etl/export";
+    }
     @PostMapping("etl/create")
     public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
         try {
@@ -104,9 +95,9 @@ public class EtlController {
             // Đọc từng dòng trong tệp tin CSV và thêm vào cơ sở dữ liệu
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
-                Long id = Long.valueOf(data[0]);
+                long id = Long.parseLong(data[0]);
                 String name = data[1];
-                Integer age = Integer.valueOf(data[2]);
+                int age = Integer.parseInt(data[2]);
                 String email = data[3];
                 statement.setLong(1, id);
                 statement.setString(2, name);
@@ -124,11 +115,17 @@ public class EtlController {
     }
 
 
+    @PostMapping("etl/export")
+   public void exportCSVFile(){
+        EtlModel etlModel = new EtlModel();
 
-
-
+        String filePath = "E:/output.csv";
+        EtlService.exportToCSV(etlModel, filePath);
+    }
 
 }
+
+
 
 
 

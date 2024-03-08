@@ -46,19 +46,20 @@ public class UsersService {
         usersRepository.save(usersModel);
     }
     // login
-    public boolean authenticateUser(String email, String password) {
-        UsersModel user = usersRepository.findByEmail(email);
-        if (user != null) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            return encoder.matches(password, user.getPassword());
-        }
-        return false;
-    }
-
+//    public boolean authenticateUser(String email, String password) {
+//        UsersModel user = usersRepository.findByEmail(email);
+//        if (user != null) {
+//            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//            return encoder.matches(password, user.getPassword());
+//        }
+//        return false;
+//    }
+    //checkemail exists
     public boolean EmailSame(String email){
         UsersModel EmailExist = usersRepository.findByEmail(email);
         return EmailExist == null;
     }
+    // checkuser exists
     public boolean UsernameSame(String username){
         UsersModel UsernameExist = usersRepository.findByEmail(username);
         return UsernameExist == null;
@@ -72,7 +73,7 @@ public class UsersService {
     }
 
 
-
-
-
+    public UsersModel findByEmail(String email) {
+        return usersRepository.findByEmail(email);
+    }
 }

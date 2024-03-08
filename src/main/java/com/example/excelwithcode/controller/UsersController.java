@@ -144,22 +144,22 @@ public class UsersController {
 
     @PostMapping("/login")
     public String login(@Valid UsersModel usersModel, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "register"; // Return to the registration page if there are validation errors
+        try {
+            if (bindingResult.hasErrors()) {
+                return "login";
+            }
+
+            UsersModel user = usersService.findByEmail(usersModel.getEmail());
+            if (user != null && Objects.equals(user.getPassword(), usersModel.getPassword())) {
+                // Email và mật khẩu khớp, đăng nhập thành công, chuyển hướng đến trang chính
+                return "index";
+            }
+
+            // Email không tồn tại hoặc mật khẩu không khớp, trở lại trang đăng nhập
+            return "login";
+        } catch (Exception e) {
+            return "login";
         }
-
-        boolean isAuthenticated = usersService.authenticateUser(usersModel.getEmail(), usersModel.getPassword());
-
-        if (!isAuthenticated) {
-            // Generate the token
-            String token = Jwts.builder()
-                    // .signWith(SignatureAlgorithm.HS256, "sdaAa@dawâss")
-                    .setSubject(usersModel.getEmail())
-                    .compact();
-
-            return "login"; // Redirect to the login success page
-        }
-        return "index";
     }
 
 
