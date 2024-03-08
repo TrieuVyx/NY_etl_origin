@@ -1,6 +1,5 @@
 package com.example.excelwithcode.controller;
 
-
 import com.example.excelwithcode.model.UsersModel;
 import com.example.excelwithcode.service.UsersService;
 import io.jsonwebtoken.Jwts;
@@ -10,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
+import jakarta.validation.Valid;
 
 @Controller
 public class UsersController {
@@ -29,6 +28,7 @@ public class UsersController {
         model.addAttribute("usersModel", usersModel);
         return "Users/index";
     }
+
     // create form
     @GetMapping("users/api/create")
     public String ShowFormCreate(Model model){
@@ -53,11 +53,12 @@ public class UsersController {
     }
     //register form
     @GetMapping("/register")
-    public String ShowFormRegister(Model model){
+    public String ShowFormRegister(@ModelAttribute Model model){
         UsersModel usersModel = new UsersModel();
         model.addAttribute("usersModel",usersModel);
         return "register";
     }
+
     //login form
     @GetMapping("/login")
     public String ShowFormLogin(Model model){
@@ -67,9 +68,14 @@ public class UsersController {
     }
 
     //create
-    @PostMapping ( "users/api/create" )
-    public ResponseEntity<UsersModel> createUser( UsersModel usersModel){
+    @PostMapping ( "users/create" )
+    public String createUser(@Valid UsersModel usersModel, BindingResult bindingResult){
+        return getString(usersModel, bindingResult);
+    }
+
+    private String getString(@Valid UsersModel usersModel, BindingResult bindingResult) {
         try{
+
             // Mã hóa mật keys
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String hashedPassword = encoder.encode(usersModel.getPassword());
@@ -78,20 +84,25 @@ public class UsersController {
             usersModel1.setUsername(usersModel.getUsername());
             usersModel1.setEmail(usersModel.getEmail());
             usersModel1.setPassword(hashedPassword);
+
             // Tạo mã thông báo
             String token = Jwts.builder()
             // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
                     .setSubject(usersModel.getUsername())
                     .compact() ;
+
             // Trả về mã thông báo trong response
             usersModel1.setToken(token);
-            usersService.setUser(usersModel1);
-            return new ResponseEntity<>( usersModel1,HttpStatus.OK);
+
+//            return new ResponseEntity<>( usersModel1,HttpStatus.OK);
+            return  usersService.setUser(usersModel1);
         }
         catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return e.getMessage();
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping("/users/api/delete/{id}")
     public String deleteUser(@PathVariable Long id, Model model){
         try {
@@ -129,7 +140,8 @@ public class UsersController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/users/api/login")
+
+    @PostMapping("/login")
     public ResponseEntity<String> login( UsersModel usersModel) {
         try {
             boolean isAuthenticated = usersService.authenticateUser(usersModel.getUsername(), usersModel.getPassword());
@@ -147,5 +159,14 @@ public class UsersController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+    @PostMapping ( "/register" )
+    public String createUserR(@Valid  UsersModel usersModel, BindingResult bindingResult){
+       return getString(usersModel, bindingResult);
+    }
+    @PostMapping ( "/deleteAll" )
+    public String deleteAll(){
+        usersService.DeleteAll();
+        return "Users/index";
     }
 }

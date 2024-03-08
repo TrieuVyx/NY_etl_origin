@@ -17,7 +17,6 @@ public class UsersService {
         this.usersRepository =usersRepository;
     }
 
-
     //all user
     public List<UsersModel> getAllUser(){
         return usersRepository.findAll();
@@ -28,8 +27,9 @@ public class UsersService {
         return usersRepository.findById(id).orElse(null);
     }
     //create
-    public void setUser(UsersModel usersModel){
+    public String setUser(UsersModel usersModel){
         usersRepository.save(usersModel);
+        return null;
     }
     //delete
     public void deleteUser(Long id) throws NotFoundException {
@@ -53,6 +53,13 @@ public class UsersService {
             return encoder.matches(password, user.getPassword());
         }
         return false;
+    }
+
+    //delete all
+
+    public String DeleteAll(){
+        usersRepository.deleteAll();
+        return null;
     }
 
 }

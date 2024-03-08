@@ -14,8 +14,13 @@
 <body>
 <div class="container">
     <h1 class="text-center my-4">Users List</h1>
-    <a class="btn btn-outline-success my-2 my-sm-0"  href="/users/api/create">Create User</a>
-    <a class="btn btn-outline-success my-2 my-sm-0"  href="/">Home</a>
+    <div class="d-flex flex-box">
+        <a class="btn btn-outline-success my-2 my-sm-0"  href="/users/api/create">Create User</a>
+        <a class="btn btn-outline-success my-2 my-sm-0 m-2"  href="/">Home</a>
+        <form th:action="@{deleteAll}" method="POST" >
+            <button class="btn btn-outline-success my-2 my-sm-0"  type="submit" >DeleteAll User</button>
+        </form>
+    </div>
 
     <table class="table">
 
