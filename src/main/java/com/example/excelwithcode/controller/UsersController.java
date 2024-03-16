@@ -3,18 +3,26 @@ package com.example.excelwithcode.controller;
 import com.example.excelwithcode.model.UsersModel;
 import com.example.excelwithcode.service.UsersService;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
+import javax.mail.Session;
 
 @Controller
 public class UsersController {
@@ -94,12 +102,10 @@ public class UsersController {
             // Trả về mã thông báo trong response
             usersModel1.setToken(token);
             usersService.setUser(usersModel1);
-//            return new ResponseEntity<>( usersModel1,HttpStatus.OK);
             return  "Users/create";
         }
         catch(Exception e){
             return e.getMessage();
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -151,11 +157,9 @@ public class UsersController {
 
             UsersModel user = usersService.findByEmail(usersModel.getEmail());
             if (user != null && Objects.equals(user.getPassword(), usersModel.getPassword())) {
-                // Email và mật khẩu khớp, đăng nhập thành công, chuyển hướng đến trang chính
                 return "index";
             }
 
-            // Email không tồn tại hoặc mật khẩu không khớp, trở lại trang đăng nhập
             return "login";
         } catch (Exception e) {
             return "login";
@@ -183,21 +187,17 @@ public class UsersController {
             usersModel1.setEmail(usersModel.getEmail());
             usersModel1.setPassword(hashedPassword);
 
-            // Tạo mã thông báo
             String token = Jwts.builder()
                     // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
                     .setSubject(usersModel.getUsername())
                     .compact() ;
 
-            // Trả về mã thông báo trong response
             usersModel1.setToken(token);
             usersService.setUser(usersModel1);
-        //  return new ResponseEntity<>( usersModel1,HttpStatus.OK);
             return  "login";
         }
         catch(Exception e){
             return e.getMessage();
-            //    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping ( "/deleteAll" )
@@ -207,24 +207,49 @@ public class UsersController {
     }
 
 
+    @PostMapping("/send-email")
+    public ResponseEntity<String> sendEmail(@RequestBody UsersModel usersModel) {
+        String email = "trieuvy.nguyen@vn.wilmar-intl.com";
+        String password = "vlvvkkmtxgpphdlh";
 
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@Valid UsersModel usersModel, BindingResult bindingResult) {
-//        try {
-//            boolean isAuthenticated = usersService.authenticateUser(usersModel.getUsername(), usersModel.getPassword());
-//
-//            if (isAuthenticated) {
-//                String token = Jwts.builder()
-//                        // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
-//                        .setSubject(usersModel.getUsername())
-//                        .compact();
-//
-//                return new ResponseEntity<>(token, HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//            }
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp-mail.outlook.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(email, password);
+            }
+        });
+
+        try {
+            // Tạo đối tượng MimeMessage
+            Message message = new MimeMessage(session);
+
+            // Địa chỉ người gửi
+            message.setFrom(new InternetAddress(email));
+
+            // Địa chỉ người nhận
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(usersModel.getEmail()));
+
+            // Tiêu đề email
+            message.setSubject("Test Email");
+
+            // Nội dung email
+            message.setText("This is a test email sent from Java.");
+
+            // Gửi email
+            Transport.send(message);
+
+            return ResponseEntity.ok("Email sent successfully.");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email.");
+        }
+    }
+
+
 }
