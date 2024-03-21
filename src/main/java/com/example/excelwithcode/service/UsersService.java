@@ -74,6 +74,6 @@ public class UsersService {
 
 
     public UsersModel findByEmail(String email) {
-        return usersRepository.findByEmail(email);
+        return usersRepository.findFirstByEmail(email);
     }
 }

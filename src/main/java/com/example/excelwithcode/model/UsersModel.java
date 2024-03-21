@@ -14,22 +14,27 @@ public class UsersModel {
 
 //    @Max(15)
 //    @Min(5)
-    @NotBlank(message = "Username cannot empty")
+//    @NotBlank(message = "Username cannot empty")
     private String username;
 //    @Max(value = 15, message = "Character have to equal 15 or much than 15")
 //    @Min(value = 10, message = "Character have to equal 10 or less than 10")
-    @NotBlank(message = "Password cannot empty")
+//    @NotBlank(message = "Password cannot empty")
     private String password;
-    @NotBlank(message = "Email cannot empty")
+//    @NotBlank(message = "Email cannot empty")
     @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "Invalid email format")
     private String email;
     private String token;
     private String permission;
     private String avatar;
-
+    private String code;
     public UsersModel() {
     }
-
+    public void setCode(String code){
+        this.code = code;
+    }
+    public String getCode(){
+        return code;
+    }
 
     public void setId(Long id) {
         this.id = id;

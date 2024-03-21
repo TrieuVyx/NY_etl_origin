@@ -1,30 +1,26 @@
 package com.example.excelwithcode.controller;
-
 import com.example.excelwithcode.model.UsersModel;
 import com.example.excelwithcode.service.UsersService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import jakarta.validation.Valid;
-import javax.mail.Session;
-
+import java.util.Date;
 @Controller
+@CrossOrigin("http://localhost:3000/")
+
 public class UsersController {
     private final UsersService usersService;
    @Autowired
@@ -93,14 +89,6 @@ public class UsersController {
             usersModel1.setEmail(usersModel.getEmail());
             usersModel1.setPassword(hashedPassword);
 
-            // Tạo mã thông báo
-            String token = Jwts.builder()
-                    // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
-                    .setSubject(usersModel.getUsername())
-                    .compact() ;
-
-            // Trả về mã thông báo trong response
-            usersModel1.setToken(token);
             usersService.setUser(usersModel1);
             return  "Users/create";
         }
@@ -136,7 +124,9 @@ public class UsersController {
 
             if (usersModel.getPassword() != null) {
                 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-                String hashedPassword = encoder.encode(usersModel.getPassword());
+                String hashedPassword = encoder.encode(usersModel.getPassword(
+
+                ));
                 existingUser.setPassword(hashedPassword);
             }
 
@@ -149,20 +139,30 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid UsersModel usersModel, BindingResult bindingResult) {
+    public ResponseEntity<UsersModel> login(@Valid @RequestBody UsersModel usersModel) {
         try {
-            if (bindingResult.hasErrors()) {
-                return "login";
-            }
-
             UsersModel user = usersService.findByEmail(usersModel.getEmail());
-            if (user != null && Objects.equals(user.getPassword(), usersModel.getPassword())) {
-                return "index";
-            }
 
-            return "login";
+
+            if(user!= null && BCrypt.checkpw(usersModel.getPassword(), user.getPassword())){
+                String secretKey = "aa76ce10af6dbc9a8c75b4b2b68c8f84ba78794e689baf4d2c17d31bd0731f13b7c1e6ac381e4426494a89f6b4549b5327b705f16c2e4a1aee0cb82c90186914eb7a95c8e3f5ac6d0f44590cf5a6341bbdd189b1ff45fbdffa900abfecb76323c131a93a5fc8e90010e668913cdde5373428bd24a332a4dccba41d9e3895d1afee94457910df844a98a344d0e7a42db80e6c2f43a5d0454af0721fc33b3ff329733d1f6b9cf95b5586c4cb33edb96d12dfd1693cb189e2fb7696f07fb988098715e425c6bf7073f86f0dc4b294339171704c6d6455563e6e99d338fb3caa937e7a5a464cd0e01b5918bf1286817946851c4df56d1cfe3ea5c9e4704d21137b16";
+                    /// set token refresh
+                String token = Jwts.builder()
+                        .setId(UUID.randomUUID().toString())
+                        .setIssuedAt(Date.from(Instant.now()))
+                        .setExpiration(Date.from(Instant.now().plus(5L, ChronoUnit.MINUTES)))
+                        .setSubject(user.getEmail())
+                        .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
+                        .compact();
+
+                user.setToken(token);
+
+
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return "login";
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -187,12 +187,6 @@ public class UsersController {
             usersModel1.setEmail(usersModel.getEmail());
             usersModel1.setPassword(hashedPassword);
 
-            String token = Jwts.builder()
-                    // .signWith( SignatureAlgorithm.HS256, "sdaAa@dawâss")
-                    .setSubject(usersModel.getUsername())
-                    .compact() ;
-
-            usersModel1.setToken(token);
             usersService.setUser(usersModel1);
             return  "login";
         }
@@ -206,50 +200,6 @@ public class UsersController {
         return "Users/index";
     }
 
-
-    @PostMapping("/send-email")
-    public ResponseEntity<String> sendEmail(@RequestBody UsersModel usersModel) {
-        String email = "trieuvy.nguyen@vn.wilmar-intl.com";
-        String password = "vlvvkkmtxgpphdlh";
-
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp-mail.outlook.com");
-        props.put("mail.smtp.port", "587");
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(email, password);
-            }
-        });
-
-        try {
-            // Tạo đối tượng MimeMessage
-            Message message = new MimeMessage(session);
-
-            // Địa chỉ người gửi
-            message.setFrom(new InternetAddress(email));
-
-            // Địa chỉ người nhận
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(usersModel.getEmail()));
-
-            // Tiêu đề email
-            message.setSubject("Test Email");
-
-            // Nội dung email
-            message.setText("This is a test email sent from Java.");
-
-            // Gửi email
-            Transport.send(message);
-
-            return ResponseEntity.ok("Email sent successfully.");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send email.");
-        }
-    }
 
 
 }
